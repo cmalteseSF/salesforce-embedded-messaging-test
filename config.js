@@ -14,10 +14,10 @@ const EmbeddedMessagingConfig = {
   orgId: '00DWt00000GFp5p',
   
   // Queue name from your Salesforce org
-  queueName: 'Hipotecas',
+  queueName: 'miawtest',
   
   // Your Salesforce site URL (from Embedded Messaging setup)
-  siteUrl: 'https://storm-d9385041c074ca.my.site.com/ESWHipotecas1773225838319',
+  siteUrl: 'https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236',
   
   // SCRT URL for secure communication
   scrtUrl: 'https://storm-d9385041c074ca.my.salesforce-scrt.com',
