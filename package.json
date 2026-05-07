@@ -1,0 +1,7 @@
+{
+  "name": "salesforce-embedded-messaging-test",
+  "description": "Testing environment for Salesforce Embedded Messaging with GitHub Pages",
+  "version": "1.0.0",
+  "keywords": ["salesforce", "embedded-messaging", "github-pages"],
+  "author": "Carlos Maltese"
+}

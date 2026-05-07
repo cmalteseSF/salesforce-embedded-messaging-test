@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce Embedded Messaging - Test Local</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            line-height: 1.4;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #f0f9ff;
+            border-left: 4px solid #667eea;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .console {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85em;
+            max-height: 250px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+
+        .console-log {
+            margin: 5px 0;
+            padding: 3px 0;
+        }
+
+        .console-log.info { color: #569cd6; }
+        .console-log.success { color: #6a9955; }
+        .console-log.error { color: #f48771; }
+        .console-log.warning { color: #dcdcaa; }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .info-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #92400e;
+            font-size: 0.95em;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #065f46;
+            font-size: 0.95em;
+        }
+
+        .error-box {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #7f1d1d;
+            font-size: 0.95em;
+        }
+
+        footer {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Salesforce Embedded Messaging - Test Local</h1>
+            <p class="subtitle">Testing environment for Embedded Messaging snippet integration</p>
+        </header>
+
+        <div class="content">
+            <!-- Panel Left: Configuration -->
+            <div class="card">
+                <h2>📋 Configuration Details</h2>
+
+                <div class="status">
+                    <div class="status-indicator"></div>
+                    <span>Server Status: <strong>Active</strong></span>
+                </div>
+
+                <h3 style="color: #667eea; margin-top: 20px; margin-bottom: 10px;">Snippet Parameters:</h3>
+                <div class="code-block">
+                    <strong>Org ID:</strong> 00DWt00000GFp5p<br>
+                    <strong>Queue Name:</strong> Hipotecas<br>
+                    <strong>Site URL:</strong> https://storm-d9385041c074ca.my.site.com/ESWHipotecas1773225838319<br>
+                    <strong>SCRT URL:</strong> https://storm-d9385041c074ca.my.salesforce-scrt.com<br>
+                    <strong>Language:</strong> en_US
+                </div>
+
+                <h3 style="color: #667eea; margin-top: 20px; margin-bottom: 10px;">Current Environment:</h3>
+                <div class="info-box">
+                    ✓ GitHub Pages - Public URL<br>
+                    ✓ CORS enabled<br>
+                    ✓ Console logging active
+                </div>
+
+                <div class="button-group">
+                    <button onclick="testConnection()">🔗 Test Connection</button>
+                    <button onclick="clearConsole()">🗑️ Clear Console</button>
+                </div>
+            </div>
+
+            <!-- Panel Right: Console -->
+            <div class="card">
+                <h2>📟 Console Output</h2>
+                <div class="console" id="console">
+                    <div class="console-log info">[INFO] Console initialized...</div>
+                    <div class="console-log info">[INFO] Ready for Embedded Messaging testing</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Panel: Snippet Code -->
+        <div class="card">
+            <h2>📝 Your Embedded Messaging Snippet</h2>
+            <p style="color: #666; margin-bottom: 15px;">This is the snippet that is loaded in your page:</p>
+            <div class="code-block">
+&lt;script type='text/javascript'&gt;
+    function initEmbeddedMessaging() {
+        try {
+            embeddedservice_bootstrap.settings.language = 'en_US';
+            embeddedservice_bootstrap.init(
+                '00DWt00000GFp5p',
+                'Hipotecas',
+                'https://storm-d9385041c074ca.my.site.com/ESWHipotecas1773225838319',
+                {
+                    scrt2URL: 'https://storm-d9385041c074ca.my.salesforce-scrt.com'
+                }
+            );
+        } catch (err) {
+            console.error('Error loading Embedded Messaging: ', err);
+        }
+    }
+&lt;/script&gt;
+&lt;script type='text/javascript' 
+    src='https://storm-d9385041c074ca.my.site.com/ESWHipotecas1773225838319/assets/js/bootstrap.min.js' 
+    onload='initEmbeddedMessaging()'&gt;
+&lt;/script&gt;
+            </div>
+
+            <div class="info-box">
+                <strong>⚠️ Nota:</strong> El script de bootstrap se carga desde Salesforce (CDN remoto). En este entorno, veremos si hay errores CORS o de conectividad.
+            </div>
+        </div>
+
+        <!-- Status Panel -->
+        <div class="card" style="margin-top: 20px;">
+            <h2>🧪 Testing Information</h2>
+            
+            <p style="color: #666; margin-bottom: 15px;">Usa los botones de arriba para:</p>
+            <ul style="margin-left: 20px; color: #666; line-height: 1.8;">
+                <li><strong>Test Connection:</strong> Verifica si el servidor está respondiendo correctamente</li>
+                <li><strong>Clear Console:</strong> Limpia el registro de la consola</li>
+                <li><strong>Browser Console (F12):</strong> Abre las herramientas de desarrollo para ver logs completos</li>
+            </ul>
+
+            <div class="success-box" style="margin-top: 20px;">
+                ✅ <strong>Para depuración:</strong> Abre la consola del navegador (F12 o Cmd+Option+I en Mac) para ver todos los logs, errores y mensajes de la carga del snippet.
+            </div>
+        </div>
+
+        <footer>
+            <p>Created by: <strong>Carlos Maltese - Salesforce</strong> | Date: <strong>2026-05-07</strong></p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Salesforce Embedded Messaging Test Environment - GitHub Pages</p>
+        </footer>
+    </div>
+
+    <!-- Custom logging function for local testing -->
+    <script type='text/javascript'>
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToConsole('info', args.join(' '));
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToConsole('error', args.join(' '));
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            logToConsole('warning', args.join(' '));
+        };
+
+        function logToConsole(type, message) {
+            const consoleElement = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `console-log ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            consoleElement.appendChild(logEntry);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+
+        function testConnection() {
+            console.log('🧪 Testing connection...');
+            logToConsole('success', '✅ Page loaded successfully');
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = '';
+            console.log('🗑️ Console cleared');
+        }
+
+        window.addEventListener('load', () => {
+            console.log('✅ Page fully loaded');
+            console.log('📍 Environment: GitHub Pages - Public URL');
+        });
+
+        window.addEventListener('error', (event) => {
+            console.error('❌ Error:', event.message, 'at', event.filename, event.lineno);
+        });
+    </script>
+
+</body>
+</html>
