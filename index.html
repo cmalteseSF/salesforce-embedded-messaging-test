@@ -243,6 +243,7 @@
                 <div class="button-group">
                     <button onclick="testConnection()">🔗 Test Connection</button>
                     <button onclick="clearConsole()">🗑️ Clear Console</button>
+                    <button onclick="loadEmbeddedMessaging()">💬 Load Chat Widget</button>
                 </div>
             </div>
 
@@ -352,6 +353,58 @@
             console.log('🗑️ Console cleared');
         }
 
+        function loadEmbeddedMessaging() {
+            console.log('🔄 Attempting to load Embedded Messaging widget...');
+            logToConsole('info', '🔄 Loading Embedded Messaging widget...');
+            
+            // Create and inject the bootstrap script
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236/assets/js/bootstrap.min.js';
+            
+            script.onload = function() {
+                console.log('✅ Bootstrap script loaded successfully');
+                logToConsole('success', '✅ Bootstrap script loaded');
+                
+                setTimeout(() => {
+                    try {
+                        console.log('🔄 Initializing Embedded Messaging...');
+                        logToConsole('info', '🔄 Initializing Embedded Messaging...');
+                        
+                        if (typeof embeddedservice_bootstrap === 'undefined') {
+                            throw new Error('embeddedservice_bootstrap is not defined');
+                        }
+                        
+                        embeddedservice_bootstrap.settings.language = 'en_US';
+                        console.log('✅ Language configured');
+                        
+                        embeddedservice_bootstrap.init(
+                            '00DWt00000GFp5p',
+                            'miawtest',
+                            'https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236',
+                            {
+                                scrt2URL: 'https://storm-d9385041c074ca.my.salesforce-scrt.com'
+                            }
+                        );
+                        
+                        console.log('✅ Embedded Messaging initialized successfully!');
+                        logToConsole('success', '✅ Chat widget is ready! Look for it in the bottom right corner');
+                        
+                    } catch (err) {
+                        console.error('❌ Error initializing:', err);
+                        logToConsole('error', '❌ Error: ' + err.message);
+                    }
+                }, 500);
+            };
+            
+            script.onerror = function() {
+                console.error('❌ Failed to load bootstrap script');
+                logToConsole('error', '❌ Failed to load bootstrap script - Check CORS settings');
+            };
+            
+            document.head.appendChild(script);
+        }
+
         window.addEventListener('load', () => {
             console.log('✅ Page fully loaded');
             console.log('📍 Environment: GitHub Pages - Public URL');
@@ -360,53 +413,12 @@
         window.addEventListener('error', (event) => {
             console.error('❌ Error:', event.message, 'at', event.filename, event.lineno);
         });
-    </script>
 
-    <!-- Embedded Messaging Snippet with debugging -->
-    <script type='text/javascript'>
-        function initEmbeddedMessaging() {
-            try {
-                console.log('🔄 Initializing Embedded Messaging...');
-                console.log('embeddedservice_bootstrap available?', typeof embeddedservice_bootstrap !== 'undefined');
-                
-                if (typeof embeddedservice_bootstrap === 'undefined') {
-                    console.error('❌ embeddedservice_bootstrap is NOT available');
-                    console.log('⏳ Waiting for bootstrap to load...');
-                    setTimeout(initEmbeddedMessaging, 1000);
-                    return;
-                }
-                
-                console.log('✅ embeddedservice_bootstrap found!');
-                embeddedservice_bootstrap.settings.language = 'en_US';
-                console.log('✅ Language set to en_US');
-
-                embeddedservice_bootstrap.init(
-                    '00DWt00000GFp5p',
-                    'miawtest',
-                    'https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236',
-                    {
-                        scrt2URL: 'https://storm-d9385041c074ca.my.salesforce-scrt.com'
-                    }
-                );
-                console.log('✅ Embedded Messaging initialized successfully!');
-                console.log('✅ Chat widget should appear in the bottom right corner');
-                
-            } catch (err) {
-                console.error('❌ Error loading Embedded Messaging: ', err);
-                console.error('Error Stack:', err.stack);
-            }
-        }
-        
-        // Wait for bootstrap to load
-        if (typeof embeddedservice_bootstrap !== 'undefined') {
-            initEmbeddedMessaging();
-        } else {
-            console.log('⏳ Waiting for bootstrap script to load...');
-        }
-    </script>
-    <script type='text/javascript' 
-        src='https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236/assets/js/bootstrap.min.js' 
-        onload='initEmbeddedMessaging()'&gt;
+        // Log when page is ready
+        window.addEventListener('load', () => {
+            console.log('💡 Tip: Click "Load Chat Widget" button to initialize Embedded Messaging');
+            logToConsole('info', '💡 Click "Load Chat Widget" button to initialize Embedded Messaging');
+        });
     </script>
 
 </body>
