@@ -306,6 +306,31 @@
             </div>
         </div>
 
+        <!-- LocalStorage Panel -->
+        <div class="card" style="margin-top: 20px;">
+            <h2>💾 LocalStorage & SessionStorage</h2>
+            <p style="color: #666; margin-bottom: 15px;">Elementos almacenados en el navegador:</p>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #667eea; margin-bottom: 10px;">LocalStorage</h3>
+                <div class="code-block" id="localStorageList" style="max-height: 400px;">
+                    <div style="color: #999;">Cargando...</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #667eea; margin-bottom: 10px;">SessionStorage</h3>
+                <div class="code-block" id="sessionStorageList" style="max-height: 400px;">
+                    <div style="color: #999;">Cargando...</div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button onclick="refreshStorage()">🔄 Refresh Storage</button>
+                <button onclick="clearAllStorage()">🗑️ Clear All Storage</button>
+            </div>
+        </div>
+
         <footer>
             <p>Created by: <strong>Carlos Maltese - Salesforce</strong> | Date: <strong>2026-05-07</strong></p>
             <p style="font-size: 0.9em; margin-top: 10px;">Salesforce Embedded Messaging Test Environment - GitHub Pages</p>
@@ -351,6 +376,112 @@
         function clearConsole() {
             document.getElementById('console').innerHTML = '';
             console.log('🗑️ Console cleared');
+        }
+
+        function refreshStorage() {
+            displayLocalStorage();
+            displaySessionStorage();
+            console.log('🔄 Storage refreshed');
+            logToConsole('success', '✅ Storage refreshed');
+        }
+
+        function displayLocalStorage() {
+            const container = document.getElementById('localStorageList');
+            
+            if (localStorage.length === 0) {
+                container.innerHTML = '<div style="color: #999;">No hay elementos en LocalStorage</div>';
+                return;
+            }
+            
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr style="background: #f0f0f0;"><th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Key</th><th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Value (preview)</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid #ddd;">Action</th></tr>';
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                const preview = value.substring(0, 100) + (value.length > 100 ? '...' : '');
+                
+                html += `<tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 8px; word-break: break-all;"><strong>${escapeHtml(key)}</strong></td>
+                    <td style="padding: 8px; color: #666; font-size: 0.9em; word-break: break-all;">${escapeHtml(preview)}</td>
+                    <td style="padding: 8px; text-align: center;">
+                        <button onclick="deleteLocalStorageItem('${escapeHtml(key)}')" style="padding: 4px 8px; font-size: 0.85em; background: #ef4444; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete</button>
+                    </td>
+                </tr>`;
+            }
+            
+            html += '</table>';
+            container.innerHTML = html;
+            console.log(`📊 LocalStorage: ${localStorage.length} items`);
+        }
+
+        function displaySessionStorage() {
+            const container = document.getElementById('sessionStorageList');
+            
+            if (sessionStorage.length === 0) {
+                container.innerHTML = '<div style="color: #999;">No hay elementos en SessionStorage</div>';
+                return;
+            }
+            
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr style="background: #f0f0f0;"><th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Key</th><th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Value (preview)</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid #ddd;">Action</th></tr>';
+            
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                const value = sessionStorage.getItem(key);
+                const preview = value.substring(0, 100) + (value.length > 100 ? '...' : '');
+                
+                html += `<tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 8px; word-break: break-all;"><strong>${escapeHtml(key)}</strong></td>
+                    <td style="padding: 8px; color: #666; font-size: 0.9em; word-break: break-all;">${escapeHtml(preview)}</td>
+                    <td style="padding: 8px; text-align: center;">
+                        <button onclick="deleteSessionStorageItem('${escapeHtml(key)}')" style="padding: 4px 8px; font-size: 0.85em; background: #ef4444; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete</button>
+                    </td>
+                </tr>`;
+            }
+            
+            html += '</table>';
+            container.innerHTML = html;
+            console.log(`📊 SessionStorage: ${sessionStorage.length} items`);
+        }
+
+        function deleteLocalStorageItem(key) {
+            if (confirm(`¿Estás seguro de que quieres borrar la clave: ${key}?`)) {
+                localStorage.removeItem(key);
+                console.log(`🗑️ Deleted from localStorage: ${key}`);
+                logToConsole('success', `✅ Deleted: ${key}`);
+                refreshStorage();
+            }
+        }
+
+        function deleteSessionStorageItem(key) {
+            if (confirm(`¿Estás seguro de que quieres borrar la clave: ${key}?`)) {
+                sessionStorage.removeItem(key);
+                console.log(`🗑️ Deleted from sessionStorage: ${key}`);
+                logToConsole('success', `✅ Deleted: ${key}`);
+                refreshStorage();
+            }
+        }
+
+        function clearAllStorage() {
+            if (confirm('⚠️ ¿Estás seguro de que quieres borrar TODO el localStorage y sessionStorage?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log('🗑️ All storage cleared');
+                logToConsole('success', '✅ All storage cleared');
+                refreshStorage();
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
 
         function loadEmbeddedMessaging() {
@@ -449,6 +580,10 @@
             console.log('📍 Environment: GitHub Pages - Public URL');
             console.log('💡 Tip: Click "Load Chat Widget" button to initialize Embedded Messaging');
             logToConsole('info', '💡 Click "Load Chat Widget" button to initialize Embedded Messaging');
+            
+            // Display storage when page loads
+            displayLocalStorage();
+            displaySessionStorage();
         });
 
         window.addEventListener('error', (event) => {
