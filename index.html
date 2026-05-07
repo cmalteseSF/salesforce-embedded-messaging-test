@@ -357,67 +357,102 @@
             console.log('🔄 Attempting to load Embedded Messaging widget...');
             logToConsole('info', '🔄 Loading Embedded Messaging widget...');
             
-            // Create and inject the bootstrap script
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236/assets/js/bootstrap.min.js';
-            
-            script.onload = function() {
-                console.log('✅ Bootstrap script loaded successfully');
-                logToConsole('success', '✅ Bootstrap script loaded');
+            // Check if embeddedservice_bootstrap is already loaded
+            if (typeof embeddedservice_bootstrap !== 'undefined') {
+                console.log('✅ Bootstrap already loaded');
+                initializeEmbeddedMessaging();
+            } else {
+                console.log('⏳ Bootstrap not loaded, loading script...');
+                logToConsole('info', '⏳ Loading bootstrap script from Salesforce...');
                 
-                setTimeout(() => {
-                    try {
-                        console.log('🔄 Initializing Embedded Messaging...');
-                        logToConsole('info', '🔄 Initializing Embedded Messaging...');
-                        
-                        if (typeof embeddedservice_bootstrap === 'undefined') {
-                            throw new Error('embeddedservice_bootstrap is not defined');
+                // Load the bootstrap script
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = 'https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236/assets/js/bootstrap.min.js';
+                
+                script.onload = function() {
+                    console.log('✅ Bootstrap script loaded successfully');
+                    logToConsole('success', '✅ Bootstrap script loaded');
+                    
+                    // Wait for embeddedservice_bootstrap to be available
+                    const checkBootstrap = setInterval(() => {
+                        if (typeof embeddedservice_bootstrap !== 'undefined') {
+                            clearInterval(checkBootstrap);
+                            initializeEmbeddedMessaging();
                         }
-                        
-                        embeddedservice_bootstrap.settings.language = 'en_US';
-                        console.log('✅ Language configured');
-                        
-                        embeddedservice_bootstrap.init(
-                            '00DWt00000GFp5p',
-                            'miawtest',
-                            'https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236',
-                            {
-                                scrt2URL: 'https://storm-d9385041c074ca.my.salesforce-scrt.com'
-                            }
-                        );
-                        
-                        console.log('✅ Embedded Messaging initialized successfully!');
-                        logToConsole('success', '✅ Chat widget is ready! Look for it in the bottom right corner');
-                        
-                    } catch (err) {
-                        console.error('❌ Error initializing:', err);
-                        logToConsole('error', '❌ Error: ' + err.message);
+                    }, 100);
+                    
+                    // Timeout after 5 seconds
+                    setTimeout(() => {
+                        clearInterval(checkBootstrap);
+                        if (typeof embeddedservice_bootstrap === 'undefined') {
+                            console.error('❌ embeddedservice_bootstrap failed to load after 5 seconds');
+                            logToConsole('error', '❌ Bootstrap timeout - Check CORS settings in Salesforce');
+                        }
+                    }, 5000);
+                };
+                
+                script.onerror = function() {
+                    console.error('❌ Failed to load bootstrap script');
+                    logToConsole('error', '❌ Failed to load bootstrap script - Check CORS settings');
+                    logToConsole('error', '📝 Go to Salesforce Setup → Security → CORS → Add: https://cmalteseSF.github.io');
+                };
+                
+                document.head.appendChild(script);
+            }
+        }
+
+        function initializeEmbeddedMessaging() {
+            try {
+                console.log('🔄 Initializing Embedded Messaging...');
+                logToConsole('info', '🔄 Initializing Embedded Messaging...');
+                
+                // Configure settings BEFORE calling init
+                embeddedservice_bootstrap.settings.language = 'en_US';
+                console.log('✅ Language set to en_US');
+                logToConsole('success', '✅ Language configured');
+                
+                // Initialize with correct parameters
+                embeddedservice_bootstrap.init(
+                    '00DWt00000GFp5p',  // Org ID
+                    'miawtest',         // Deployment name
+                    'https://storm-d9385041c074ca.my.site.com/ESWmiawtest1778150455236',  // Site URL
+                    {
+                        scrt2URL: 'https://storm-d9385041c074ca.my.salesforce-scrt.com'
                     }
-                }, 500);
-            };
-            
-            script.onerror = function() {
-                console.error('❌ Failed to load bootstrap script');
-                logToConsole('error', '❌ Failed to load bootstrap script - Check CORS settings');
-            };
-            
-            document.head.appendChild(script);
+                );
+                
+                console.log('✅ Init called successfully');
+                logToConsole('success', '✅ Embedded Messaging initialized');
+                
+                // Listen for the onEmbeddedMessagingReady event
+                document.addEventListener('onEmbeddedMessagingReady', function(event) {
+                    console.log('✅ onEmbeddedMessagingReady event received');
+                    logToConsole('success', '✅ Chat widget is READY! Look for it in the bottom right corner');
+                });
+                
+                // Listen for button creation
+                document.addEventListener('onEmbeddedMessagingButtonCreated', function(event) {
+                    console.log('✅ Chat button created');
+                    logToConsole('success', '✅ Chat button created and visible');
+                });
+                
+            } catch (err) {
+                console.error('❌ Error initializing Embedded Messaging:', err);
+                console.error('Error details:', err.stack);
+                logToConsole('error', '❌ Initialization Error: ' + err.message);
+            }
         }
 
         window.addEventListener('load', () => {
             console.log('✅ Page fully loaded');
             console.log('📍 Environment: GitHub Pages - Public URL');
+            console.log('💡 Tip: Click "Load Chat Widget" button to initialize Embedded Messaging');
+            logToConsole('info', '💡 Click "Load Chat Widget" button to initialize Embedded Messaging');
         });
 
         window.addEventListener('error', (event) => {
             console.error('❌ Error:', event.message, 'at', event.filename, event.lineno);
-        });
-
-        // Log when page is ready
-        window.addEventListener('load', () => {
-            console.log('💡 Tip: Click "Load Chat Widget" button to initialize Embedded Messaging');
-            logToConsole('info', '💡 Click "Load Chat Widget" button to initialize Embedded Messaging');
         });
     </script>
 
