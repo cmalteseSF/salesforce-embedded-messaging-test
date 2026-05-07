@@ -516,7 +516,7 @@
                 const value = localStorage.getItem(key);
                 
                 // Check if the value or key contains Salesforce indicators
-                if (value && value.includes('WEB')) {
+                if (value && value.includes('JWT')) {
                     keysToDelete.push(key);
                     console.log(`  ❌ Found Salesforce entry: ${key}`);
                     logToConsole('warning', `  ❌ Found Salesforce entry: ${key}`);
