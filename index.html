@@ -487,28 +487,23 @@
 
         function cleanSalesforceLocalStorage() {
             console.log('🧹 Starting Salesforce LocalStorage cleanup...');
-            logToConsole('info', '🧹 Starting Salesforce LocalStorage cleanup...');
             
             // Get all domains in localStorage
             const domains = Object.keys(localStorage);
             
             // Step 1: Show current localStorage content
             console.log('📊 ===== BEFORE CLEANUP =====');
-            logToConsole('info', '📊 ===== BEFORE CLEANUP =====');
             
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 const value = localStorage.getItem(key);
                 console.log(`  [${i}] ${key}: ${value.substring(0, 100)}...`);
-                logToConsole('info', `  [${i}] ${key}: ${value.substring(0, 100)}...`);
             }
             
             console.log(`Total items before: ${localStorage.length}`);
-            logToConsole('info', `Total items before: ${localStorage.length}`);
             
             // Step 2: Find and delete keys that belong to Salesforce domains
             console.log('\n🔍 Finding Salesforce entries...');
-            logToConsole('info', '🔍 Finding Salesforce entries...');
             
             const keysToDelete = [];
             for (let i = 0; i < localStorage.length; i++) {
@@ -519,42 +514,34 @@
                 if (value && value.includes('JWT')) {
                     keysToDelete.push(key);
                     console.log(`  ❌ Found Salesforce entry: ${key}`);
-                    logToConsole('warning', `  ❌ Found Salesforce entry: ${key}`);
                 }
             }
             
             console.log(`\n🗑️ Deleting ${keysToDelete.length} Salesforce entries...`);
-            logToConsole('warning', `🗑️ Deleting ${keysToDelete.length} Salesforce entries...`);
             
             // Step 3: Delete the Salesforce keys
             keysToDelete.forEach(key => {
                 const value = localStorage.getItem(key);
                 localStorage.removeItem(key);
                 console.log(`  ✅ Deleted: ${key}`);
-                logToConsole('success', `  ✅ Deleted: ${key}`);
             });
             
             // Step 4: Show localStorage after cleanup
             console.log('\n📊 ===== AFTER CLEANUP =====');
-            logToConsole('info', '📊 ===== AFTER CLEANUP =====');
             
             if (localStorage.length === 0) {
                 console.log('  ℹ️ localStorage is now empty');
-                logToConsole('info', '  ℹ️ localStorage is now empty');
             } else {
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
                     const value = localStorage.getItem(key);
                     console.log(`  [${i}] ${key}: ${value.substring(0, 100)}...`);
-                    logToConsole('info', `  [${i}] ${key}: ${value.substring(0, 100)}...`);
                 }
             }
             
             console.log(`Total items after: ${localStorage.length}`);
-            logToConsole('success', `Total items after: ${localStorage.length}`);
             
             console.log('\n✅ Cleanup complete!');
-            logToConsole('success', '✅ Cleanup complete!');
             
             // Refresh the storage display
             refreshStorage();
